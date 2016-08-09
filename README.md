@@ -38,6 +38,7 @@ Uruchom:
 npm install aztec-decoder
 ```
 
+Paczka dostępna na https://www.npmjs.com/package/aztec-decoder
 
 ####Użycie dekodera AZTEC 2D w JavaScript dla Node.js
 
