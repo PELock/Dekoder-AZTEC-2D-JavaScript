@@ -2,7 +2,7 @@
   "name": "aztec-decoder",
   "description": "Biblioteka programistyczna pozwalająca na dekodowanie danych z dowodów rejestracyjnych pojazdów samochodowych zapisanych w formie kodu AZTEC 2D.",
   "version": "1.1.0",
-  "tags": ["aztec2d", "aztec-decoder", "aztec", "vehicle"],
+  "keywords": ["aztec2d", "aztec-decoder", "aztec", "vehicle"],
 
   "license": "Apache-2.0",
   "author": {
@@ -20,6 +20,6 @@
 
   "dependencies": {
     "form-data" : "latest",
-    "node-fetch" : "latest",
+    "node-fetch" : "latest"
   }
 }
