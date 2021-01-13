@@ -2,7 +2,7 @@
  *
  * Dekoder kodow AZTEC 2D z dowodow rejestracyjnych interfejs Web API
  *
- * Wersja         : AZTecDecoder v1.0
+ * Wersja         : AZTecDecoder v1.1
  * Jezyk          : JavaScript dla Node.js
  * Zaleznosci     : request (https://github.com/request/request)
  * Autor          : Bartosz Wójcik (support@pelock.com)
@@ -10,19 +10,20 @@
  *
  *****************************************************************************/
 
-var request = require('request');
-var fs = require("fs");
-var path = require("path");
+const FormData = require('form-data');
+const fetch = require('node-fetch');
+const fs = require("fs");
+//const axios = require('axios');
 
 /**
  * @var {string} domyslna koncowka WebApi
  */
-var API_URL = "https://www.pelock.com/api/aztec-decoder/v1";
+const API_URL = "https://www.pelock.com/api/aztec-decoder/v1";
 
 /**
  * @var {string} klucz WebApi do uslugi AZTecDecoder
  */
-var _ApiKey = "";
+let _ApiKey = "";
 
 /**
  * Funkcja callback wywolywana po zdekodowaniu danych.
@@ -52,7 +53,7 @@ exports.SetApiKey = function(ApiKey)
 exports.DecodeText = function(Text, callback_)
 {
     // parametry
-    var Params = [];
+    const Params = [];
     Params["command"] = "decode-text";
     Params["text"] = Text;
 
@@ -96,7 +97,7 @@ exports.DecodeTextFromFile = function(TextFilePath, callback_)
 exports.DecodeImageFromFile = function DecodeImageFromFile(ImageFilePath, callback_)
 {
     // parametry
-    var Params = [];
+    const Params = [];
     Params["command"] = "decode-image";
     Params["image"] = ImageFilePath;
 
@@ -119,20 +120,8 @@ function PostRequest(ParamsArray, callback_)
         return null;
     }
 
-    // przygotuj zapytanie POST
-    var req = request.post(API_URL, function (error, response, body)
-    {
-        if (!error && response.statusCode == 200)
-        {
-            callback_(JSON.parse(body));
-        }
-        else
-        {
-            callback_(null);
-        }
-    });
-
-    var form = req.form();
+    // przygotuj forme do zapytania POST
+    const form = new FormData();
 
     // do parametrow dodaj klucz Web API
     form.append("key", _ApiKey);
@@ -143,11 +132,39 @@ function PostRequest(ParamsArray, callback_)
     // ustaw poprawnie element z plikiem
     if ('image' in ParamsArray)
     {
+        // jesli plik nie istnieje od razu wyjdz
+        if (!fs.existsSync(ParamsArray['image']))
+        {
+            callback_(null);
+            return null;
+        }
+
         form.append('image', fs.createReadStream(ParamsArray['image']));
     }
     else
     {
-        // do parametrow dodaj komende
+        // do parametrow dodaj odczytany kod AZTEC 2D
         form.append("text", ParamsArray['text']);
     }
-}
+
+    fetch(API_URL, {
+        method: 'POST',
+        body: form,
+        headers: form.getHeaders()
+    })
+        .then(response => response.json())
+        .then(response => callback_(response))
+        .catch(error => callback_(null));
+
+    // wersja wykorzystujaca axios (zwracane kody maja inny format)
+    /*
+    axios.post(API_URL, form, {
+        headers: form.getHeaders()
+    }).then(function (response) {
+        callback_(response);
+    })
+    .catch(function (error) {
+        callback_(error);
+    });
+     */
+};

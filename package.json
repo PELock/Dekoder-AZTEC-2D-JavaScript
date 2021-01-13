@@ -1,8 +1,8 @@
 {
   "name": "aztec-decoder",
   "description": "Biblioteka programistyczna pozwalająca na dekodowanie danych z dowodów rejestracyjnych pojazdów samochodowych zapisanych w formie kodu AZTEC 2D.",
-  "version": "1.0.2",
-  "tags": ["aztec2d", "aztec-decoder", "aztec"],
+  "version": "1.1.0",
+  "tags": ["aztec2d", "aztec-decoder", "aztec", "vehicle"],
 
   "license": "Apache-2.0",
   "author": {
@@ -13,7 +13,13 @@
 
   "main": "index.js",
 
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/PELock/Dekoder-AZTEC-2D-JavaScript"
+  },
+
   "dependencies": {
-    "request" : "~2.74.0"
+    "form-data" : "latest",
+    "node-fetch" : "latest",
   }
 }
