@@ -6,7 +6,7 @@
  * Jezyk          : JavaScript dla Node.js
  * Zaleznosci     : request (https://github.com/request/request)
  * Autor          : Bartosz Wójcik (support@pelock.com)
- * Strona domowa  : http://www.dekoderaztec.pl | https://www.pelock.com
+ * Strona domowa  : https://www.dekoderaztec.pl | https://www.pelock.com
  *
  *****************************************************************************/
 

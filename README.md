@@ -114,4 +114,4 @@ AZTecDecoder.DecodeTextFromFile("C:\\odczytany-ciag-znakow-aztec-2d.txt", functi
 ```
 
 Bartosz Wójcik
-https://www.pelock.com | http://www.dekoderaztec.pl
+https://www.pelock.com | https://www.dekoderaztec.pl
