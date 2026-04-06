@@ -13,13 +13,14 @@ Nasza biblioteka dekoduje dane z dowodu rejestracyjnego, zapisane w postaci kodu
 
 https://www.pelock.com/pl/produkty/dekoder-aztec
 
----
 
 ## Szybki start
 
 ```bash
 npm install aztec-decoder
 ```
+
+Paczka dostępna na https://www.npmjs.com/package/aztec-decoder
 
 ```javascript
 import { AZTecDecoder } from "aztec-decoder";
@@ -39,16 +40,6 @@ if (result?.Status === true) {
 
 - **Node.js >= 18** (biblioteka korzysta z wbudowanego `fetch()` oraz `FormData`)
 - Brak zewnętrznych zależności
-
-## Instalacja
-
-Preferowany sposób instalacji biblioteki poprzez [npm](https://www.npmjs.com/):
-
-```bash
-npm install aztec-decoder
-```
-
-Paczka dostępna na https://www.npmjs.com/package/aztec-decoder
 
 ## API
 
@@ -164,10 +155,7 @@ Dekoder AZTec może przydać się firmom i instytucjom, które pragną zautomaty
 
 Dekoder AZTec dostepny jest w trzech edycjach. Każda wersja posiada inne cechy i inne możliwości dekodowania. Wersja oparta o Web API jako jedyna posiada możliwość rozpoznawania i dekodowania danych bezpośrednio ze zdjęć i obrazków. Pozostałe wersje do dekodowania wymagają już odczytanego kodu w postaci tekstu (np. ze skanera).
 
-<details>
-<summary><strong>Porównanie edycji</strong></summary>
-
-<br />
+## Porównanie edycji
 
 <img align="right" alt="Dekodowanie kodu AZTEC 2D do formatu JSON" src="https://www.pelock.com/img/pl/produkty/dekoder-aztec/dekodowanie-kodu-aztec-2d-do-json.png">
 
@@ -184,8 +172,6 @@ Dekoder AZTec dostepny jest w trzech edycjach. Każda wersja posiada inne cechy 
 |  Darmowe aktualizacje                             | ✅      | ✅    | ✅ |
 |  Darmowe wsparcie techniczne                      | ✅      | ✅    | ✅ |
 
-</details>
-
 ### Wersja Web API
 
 Jest to najbardziej zaawansowana edycja Dekodera AZTec, ponieważ umożliwia precyzyjne rozpoznawanie i dekodowanie kodów AZTEC 2D bezpośrednio ze zdjęć oraz obrazków zapisanych w formatach PNG lub JPG.
@@ -196,10 +182,7 @@ Rozumiemy potrzeby naszych klientów oraz problemy wynikające z rozpoznawnia rz
 
 Przy tworzeniu naszego rozwiązania wzieliśmy wszystkie te czynniki pod uwagę i w efekcie nasz algorytm radzi sobie znakomicie z rozpoznawaniem kodów AZTEC 2D ze zdjęć z wszelkiego rodzaju zniekształceniami, uszkodzeniami i niedoskonałościami. Znacznie przewyższa pod względem funkcjonowania dostępne na rynku biblioteki rozpoznawnia kodów AZTEC 2D takie jak np. ZXing.
 
-<details>
-<summary><strong>Gotowe paczki dla różnych języków programowania</strong></summary>
-
-<br />
+## Gotowe paczki dla innych języków programowania
 
 Dla ułatwienia szybkiego wdrożenia, paczki instalacyjne Dekodera AZTec zostały wgrane na repozytoria dla kilku popularnych języków programowania, a dodatkowo ich kody źródłowe zostały opublikowane na GitHubie:
 
