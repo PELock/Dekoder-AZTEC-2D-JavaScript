@@ -1,5 +1,5 @@
 //
-// załącz moduł dekodera dla Node.js
+// importuj moduł Dekoder AZTec dla Node.js
 //
 import { AZTecDecoder } from "aztec-decoder";
 
@@ -7,7 +7,7 @@ import { AZTecDecoder } from "aztec-decoder";
 const decoder = new AZTecDecoder("ABCD-ABCD-ABCD-ABCD");
 
 //
-// 2. Dekoduj dane bezpośrednio z pliku graficznego i zwróć wynik jako rozkodowaną tablicę elementów JSON
+// Dekoduj dane bezpośrednio z pliku graficznego i zwróć wynik jako rozkodowaną tablicę elementów JSON
 //
 const resultPng = await decoder.decodeImageFromFile("C:\\zdjecie-kodu-aztec-2d.png");
 
