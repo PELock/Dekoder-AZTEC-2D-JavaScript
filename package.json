@@ -1,25 +1,28 @@
 {
   "name": "aztec-decoder",
   "description": "Biblioteka programistyczna pozwalająca na dekodowanie danych z dowodów rejestracyjnych pojazdów samochodowych zapisanych w formie kodu AZTEC 2D.",
-  "version": "1.1.0",
-  "keywords": ["aztec2d", "aztec-decoder", "aztec", "vehicle"],
+  "version": "2.0.0",
+  "type": "module",
+  "keywords": ["aztec2d", "aztec-decoder", "aztec", "vehicle", "registration"],
 
   "license": "Apache-2.0",
   "author": {
-          "name": "Bartosz Wójcik",
-          "email": "support@pelock.com",
-          "homepage": "https://www.pelock.com"
+    "name": "Bartosz Wójcik",
+    "email": "support@pelock.com",
+    "homepage": "https://www.pelock.com/pl/produkty/dekoder-aztec"
   },
 
   "main": "index.js",
-
-  "repository": {
-    "type" : "git",
-    "url" : "https://github.com/PELock/Dekoder-AZTEC-2D-JavaScript"
+  "exports": {
+    ".": "./index.js"
   },
 
-  "dependencies": {
-    "form-data" : "latest",
-    "node-fetch" : "latest"
+  "engines": {
+    "node": ">=18.0.0"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PELock/Dekoder-AZTEC-2D-JavaScript"
   }
 }

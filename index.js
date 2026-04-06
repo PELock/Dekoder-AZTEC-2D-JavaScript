@@ -2,169 +2,124 @@
  *
  * Dekoder kodow AZTEC 2D z dowodow rejestracyjnych interfejs Web API
  *
- * Wersja         : AZTecDecoder v1.1
- * Jezyk          : JavaScript dla Node.js
- * Zaleznosci     : request (https://github.com/request/request)
+ * Wersja         : AZTecDecoder v2.0
+ * Jezyk          : JavaScript (ESM) dla Node.js >= 18
+ * Zaleznosci     : brak (wykorzystuje wbudowane fetch i FormData)
  * Autor          : Bartosz Wójcik (support@pelock.com)
  * Strona domowa  : https://www.dekoderaztec.pl | https://www.pelock.com
  *
  *****************************************************************************/
 
-const FormData = require('form-data');
-const fetch = require('node-fetch');
-const fs = require("fs");
-//const axios = require('axios');
+import { readFile, access } from "node:fs/promises";
+import { createReadStream } from "node:fs";
+import { constants } from "node:fs";
+import { Blob } from "node:buffer";
 
-/**
- * @var {string} domyslna koncowka WebApi
- */
 const API_URL = "https://www.pelock.com/api/aztec-decoder/v1";
 
-/**
- * @var {string} klucz WebApi do uslugi AZTecDecoder
- */
-let _ApiKey = "";
+export class AZTecDecoder {
 
-/**
- * Funkcja callback wywolywana po zdekodowaniu danych.
- *
- * @callback decodedCallback
- * @param {?Array} Tablica z odczytanymi wartosciami JSON lub null jesli blad
- */
+    /** @type {string} */
+    #apiKey;
 
-/**
- * Inicjalizacja klasy AZTecDecoder
- *
- * @param {string} ApiKey Klucz do uslugi WebApi
- */
-exports.SetApiKey = function(ApiKey)
-{
-    _ApiKey = ApiKey;
-};
-
-/**
- * Dekodowanie zaszyfrowanej wartosci tekstowej do
- * wyjsciowej tablicy w formacie JSON.
- *
- * @param {string} Text     Odczytana wartosc z kodem AZTEC2D w formie ASCII
- * @returns {?Array} Tablica z odczytanymi wartosciami JSON lub null jesli blad
- * @param {decodedCallback} callback_ Funkcja callback wywolywana po zdekodowaniu danych
- */
-exports.DecodeText = function(Text, callback_)
-{
-    // parametry
-    const Params = [];
-    Params["command"] = "decode-text";
-    Params["text"] = Text;
-
-    return PostRequest(Params, callback_);
-};
-
-/**
- * Dekodowanie zaszyfrowanej wartosci tekstowej
- * ze wskaznego pliku do wyjsciowej tablicy z
- * formatu JSON.
- *
- * @param {string} TextFilePath  Sciezka do pliku z odczytana wartoscia kodu AZTEC2D
- * @param {decodedCallback} callback_ Funkcja callback wywolywana po zdekodowaniu danych
- * @returns {?Array} Tablica z odczytanymi wartosciami JSON lub null jesli blad
- */
-exports.DecodeTextFromFile = function(TextFilePath, callback_)
-{
-    fs.readFile(TextFilePath, 'utf8', function(err, data)
-    {
-        if (err)
-        {
-            callback_(null);
-            return null;
-        }
-
-        return exports.DecodeText(data, callback_);
-    });
-
-    return null;
-};
-
-/**
- * Dekodowanie zaszyfrowanej wartosci zakodowanej
- * w obrazku PNG lub JPG/JPEG do wyjsciowej tablicy
- * w formacie JSON.
- *
- * @param {string} ImageFilePath Sciezka do obrazka z kodem AZTEC2D
- * @param {decodedCallback} callback_ Funkcja callback wywolywana po zdekodowaniu danych
- * @returns {?Array} Tablica z odczytanymi wartosciami JSON lub null jesli blad
- */
-exports.DecodeImageFromFile = function DecodeImageFromFile(ImageFilePath, callback_)
-{
-    // parametry
-    const Params = [];
-    Params["command"] = "decode-image";
-    Params["image"] = ImageFilePath;
-
-    return PostRequest(Params, callback_);
-};
-
-/**
- * Wysyla zapytanie POST do serwera WebApi
- *
- * @param {Array} ParamsArray Tablica z parametrami dla zapytania POST
- * @param {decodedCallback} callback_ Funkcja callback wywolywana po zdekodowaniu danych
- * @returns {?Array} Tablica z odczytanymi wartosciami JSON lub null jesli blad
- */
-function PostRequest(ParamsArray, callback_)
-{
-    // czy jest ustawiony klucz Web API?
-    if (!_ApiKey)
-    {
-        callback_(null);
-        return null;
-    }
-
-    // przygotuj forme do zapytania POST
-    const form = new FormData();
-
-    // do parametrow dodaj klucz Web API
-    form.append("key", _ApiKey);
-
-    // do parametrow dodaj komende
-    form.append("command", ParamsArray['command']);
-
-    // ustaw poprawnie element z plikiem
-    if ('image' in ParamsArray)
-    {
-        // jesli plik nie istnieje od razu wyjdz
-        if (!fs.existsSync(ParamsArray['image']))
-        {
-            callback_(null);
-            return null;
-        }
-
-        form.append('image', fs.createReadStream(ParamsArray['image']));
-    }
-    else
-    {
-        // do parametrow dodaj odczytany kod AZTEC 2D
-        form.append("text", ParamsArray['text']);
-    }
-
-    fetch(API_URL, {
-        method: 'POST',
-        body: form,
-        headers: form.getHeaders()
-    })
-        .then(response => response.json())
-        .then(response => callback_(response))
-        .catch(error => callback_(null));
-
-    // wersja wykorzystujaca axios (zwracane kody maja inny format)
-    /*
-    axios.post(API_URL, form, {
-        headers: form.getHeaders()
-    }).then(function (response) {
-        callback_(response);
-    })
-    .catch(function (error) {
-        callback_(error);
-    });
+    /**
+     * @param {string} apiKey Klucz do uslugi WebApi
      */
-};
+    constructor(apiKey) {
+        this.#apiKey = apiKey;
+    }
+
+    /**
+     * Dekodowanie zaszyfrowanej wartosci tekstowej do
+     * wyjsciowej tablicy w formacie JSON.
+     *
+     * @param {string} text Odczytana wartosc z kodem AZTEC2D w formie ASCII
+     * @returns {Promise<Object|null>} Obiekt z odczytanymi wartosciami JSON lub null jesli blad
+     */
+    async decodeText(text) {
+        const params = {
+            command: "decode-text",
+            text,
+        };
+
+        return this.#postRequest(params);
+    }
+
+    /**
+     * Dekodowanie zaszyfrowanej wartosci tekstowej
+     * ze wskazanego pliku do wyjsciowej tablicy
+     * w formacie JSON.
+     *
+     * @param {string} textFilePath Sciezka do pliku z odczytana wartoscia kodu AZTEC2D
+     * @returns {Promise<Object|null>} Obiekt z odczytanymi wartosciami JSON lub null jesli blad
+     */
+    async decodeTextFromFile(textFilePath) {
+        try {
+            const data = await readFile(textFilePath, "utf8");
+            return this.decodeText(data);
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Dekodowanie zaszyfrowanej wartosci zakodowanej
+     * w obrazku PNG lub JPG/JPEG do wyjsciowej tablicy
+     * w formacie JSON.
+     *
+     * @param {string} imageFilePath Sciezka do obrazka z kodem AZTEC2D
+     * @returns {Promise<Object|null>} Obiekt z odczytanymi wartosciami JSON lub null jesli blad
+     */
+    async decodeImageFromFile(imageFilePath) {
+        const params = {
+            command: "decode-image",
+            image: imageFilePath,
+        };
+
+        return this.#postRequest(params);
+    }
+
+    /**
+     * Wysyla zapytanie POST do serwera WebApi
+     *
+     * @param {Object} params Obiekt z parametrami dla zapytania POST
+     * @returns {Promise<Object|null>} Obiekt z odczytanymi wartosciami JSON lub null jesli blad
+     */
+    async #postRequest(params) {
+        if (!this.#apiKey) {
+            return null;
+        }
+
+        const form = new FormData();
+
+        form.append("key", this.#apiKey);
+        form.append("command", params.command);
+
+        if (params.image) {
+            try {
+                await access(params.image, constants.R_OK);
+            } catch {
+                return null;
+            }
+
+            const fileBuffer = await readFile(params.image);
+            const blob = new Blob([fileBuffer]);
+            form.append("image", blob, params.image);
+        } else {
+            form.append("text", params.text);
+        }
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                body: form,
+            });
+
+            return await response.json();
+        } catch {
+            return null;
+        }
+    }
+}
+
+export default AZTecDecoder;
